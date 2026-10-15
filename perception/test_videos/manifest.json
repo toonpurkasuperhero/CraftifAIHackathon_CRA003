@@ -1,0 +1,12 @@
+{
+  "_comment": "Freely licensed test clips from Wikimedia Commons. Downloaded + converted by fetch_test_videos.py into /home/$USER/wildguard_media (PipeGen needs videos under /home). Order = order in the demo reel.",
+  "clips": [
+    {"id": "tapir_trailcam",      "expect": "tapir",          "title": "File:Lowland-tapir-foraging-Atlantic-Forest-Sao-Paulo-Brazil-trail-camera.webm", "license": "CC BY 4.0", "why": "Brazilian trail camera, closest to a fixed roadside camera"},
+    {"id": "anteater_trailcam",   "expect": "giant_anteater", "title": "File:Giant anteater in Santa Fe do Sul Hunter camera.webm",                      "license": "CC BY 4.0", "why": "Brazilian hunter/trail camera"},
+    {"id": "jaguarundi_trailcam", "expect": "jaguarundi",     "title": "File:Jaguarundi-santa-fe-do-sul-brazil-camera-trap.webm",                     "license": "CC BY 4.0", "why": "Brazilian camera trap"},
+    {"id": "puma_atlantic",       "expect": "puma",           "title": "File:Male-Puma-foraging-Atlantic-Forest-Sao-Paulo-Brazil.webm",               "license": "CC BY 4.0", "why": "Brazilian Atlantic Forest camera"},
+    {"id": "maned_wolf_zoo",      "expect": "maned_wolf",     "title": "File:Chrysocyon brachyurus2010.ogv",                                          "license": "CC BY-SA 3.0", "why": "Only good maned-wolf clip found (zoo enclosure)"},
+    {"id": "negative_cat",        "expect": "none",           "title": "File:Black and white cat drinks from a puddle.ogv",                           "license": "Public domain", "why": "False-positive test: domestic cat outdoors (closed-set model may call it jaguarundi/puma)"},
+    {"id": "negative_dog",        "expect": "none",           "title": "File:Dog-agility-06-05-28-luz-stp.ogv",                                       "license": "CC BY-SA 2.5", "why": "False-positive test: dogs and people"}
+  ]
+}

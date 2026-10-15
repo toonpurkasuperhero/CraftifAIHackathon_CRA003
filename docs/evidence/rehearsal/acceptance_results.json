@@ -1,0 +1,252 @@
+{
+  "started": "2026-10-15 20:10:00",
+  "target": "sim",
+  "node": "esp32-01",
+  "broker": "localhost:1883",
+  "passed": 19,
+  "total": 19,
+  "results": [
+    {
+      "name": "Node reports online (retained status)",
+      "requirements": [
+        "WG-CON-02"
+      ],
+      "passed": true,
+      "detail": "status={'state': 'online', 'fw': 'sim-1.0.0', 'rssi': -52, 'uptime_s': 0}"
+    },
+    {
+      "name": "Sensor heartbeat >= 1 Hz",
+      "requirements": [
+        "WG-SEN-04"
+      ],
+      "passed": true,
+      "detail": "3 msgs in 3.2 s"
+    },
+    {
+      "name": "Sensor payload has distance/pir/armed/state",
+      "requirements": [
+        "WG-SEN-04"
+      ],
+      "passed": true,
+      "detail": "{\"v\": 1, \"distance_cm\": 206.7, \"pir\": false, \"armed\": false, \"state\": \"IDLE\", \"mode\": \"armed\", \"threshold_cm\": 20.0}"
+    },
+    {
+      "name": "tapir: profile + severity",
+      "requirements": [
+        "WG-EVT-04",
+        "WG-EVT-05",
+        "WG-ACK-01"
+      ],
+      "passed": true,
+      "detail": "state=ALERT profile=tapir sev=HIGH (expected HIGH, confirmed=False) rtt=1 ms"
+    },
+    {
+      "name": "jaguarundi: profile + severity",
+      "requirements": [
+        "WG-EVT-04",
+        "WG-EVT-05",
+        "WG-ACK-01"
+      ],
+      "passed": true,
+      "detail": "state=ALERT profile=jaguarundi sev=WARN (expected WARN, confirmed=False) rtt=1 ms"
+    },
+    {
+      "name": "maned_wolf: profile + severity",
+      "requirements": [
+        "WG-EVT-04",
+        "WG-EVT-05",
+        "WG-ACK-01"
+      ],
+      "passed": true,
+      "detail": "state=ALERT profile=maned_wolf sev=MEDIUM (expected MEDIUM, confirmed=False) rtt=1 ms"
+    },
+    {
+      "name": "puma: profile + severity",
+      "requirements": [
+        "WG-EVT-04",
+        "WG-EVT-05",
+        "WG-ACK-01"
+      ],
+      "passed": true,
+      "detail": "state=ALERT profile=puma sev=HIGH (expected HIGH, confirmed=True) rtt=1 ms"
+    },
+    {
+      "name": "giant_anteater: profile + severity",
+      "requirements": [
+        "WG-EVT-04",
+        "WG-EVT-05",
+        "WG-ACK-01"
+      ],
+      "passed": true,
+      "detail": "state=ALERT profile=giant_anteater sev=MEDIUM (expected MEDIUM, confirmed=False) rtt=1 ms"
+    },
+    {
+      "name": "On-board RX -> actuate <= 100 ms",
+      "requirements": [
+        "WG-ACT-03"
+      ],
+      "passed": true,
+      "detail": "max 1 ms, median 0 ms over 5"
+    },
+    {
+      "name": "Low confidence (0.20) ignored",
+      "requirements": [
+        "WG-EVT-02"
+      ],
+      "passed": true,
+      "detail": "ack={'state': 'IGNORED', 'reason': 'low_conf'}"
+    },
+    {
+      "name": "Duplicate event_id -> exactly one ACK",
+      "requirements": [
+        "WG-EVT-03"
+      ],
+      "passed": true,
+      "detail": "1 ACKs"
+    },
+    {
+      "name": "Malformed payloads rejected, node keeps working",
+      "requirements": [
+        "WG-EVT-01"
+      ],
+      "passed": true,
+      "detail": "valid event after 3 bad ones was ACKed"
+    },
+    {
+      "name": "Unknown extra fields tolerated",
+      "requirements": [
+        "WG-EVT-01"
+      ],
+      "passed": true,
+      "detail": "state=ALERT"
+    },
+    {
+      "name": "Unknown class -> generic WARN profile",
+      "requirements": [
+        "WG-EVT-04"
+      ],
+      "passed": true,
+      "detail": "profile=generic sev=WARN"
+    },
+    {
+      "name": "Re-detection during alert extends it",
+      "requirements": [
+        "WG-ACT-04"
+      ],
+      "passed": true,
+      "detail": "first=ALERT second=EXTEND"
+    },
+    {
+      "name": "Disarmed mode suppresses actuation",
+      "requirements": [
+        "WG-SAF-05"
+      ],
+      "passed": true,
+      "detail": "ack={'state': 'IGNORED', 'reason': 'disarmed'}"
+    },
+    {
+      "name": "sim_trip command -> node reports ARMED",
+      "requirements": [
+        "WG-SEN-03",
+        "WG-TST-01"
+      ],
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Sensor-confirmed detection upgrades severity",
+      "requirements": [
+        "WG-EVT-05"
+      ],
+      "passed": true,
+      "detail": "sev=HIGH confirmed=True"
+    },
+    {
+      "name": "Broker -> ESP32 -> ACK round trip measured",
+      "requirements": [
+        "WG-ACK-01",
+        "WG-ACT-03"
+      ],
+      "passed": true,
+      "detail": "n=35 p50=40 ms p95=41 ms max=41 ms"
+    }
+  ],
+  "rtt_ms": [
+    0.6,
+    0.8,
+    0.8,
+    0.7,
+    1.1,
+    0.6,
+    0.8,
+    40.3,
+    40.1,
+    0.7,
+    40.8,
+    40.5,
+    0.9,
+    41.2,
+    40.2,
+    0.9,
+    40.7,
+    41.0,
+    1.1,
+    40.5,
+    40.3,
+    0.6,
+    39.9,
+    40.3,
+    0.9,
+    40.8,
+    40.5,
+    40.2,
+    40.5,
+    40.5,
+    0.3,
+    40.6,
+    40.5,
+    0.8,
+    40.8
+  ],
+  "onboard_ms": [
+    1,
+    0,
+    0,
+    0,
+    0
+  ],
+  "manual_checks": [
+    {
+      "requirements": "WG-ACT-01/02",
+      "check": "Each species shows its own LED + buzzer pattern (film it: one clip per species)"
+    },
+    {
+      "requirements": "WG-SAF-01",
+      "check": "Power-cycle during an alert: all outputs OFF at boot, returns to IDLE"
+    },
+    {
+      "requirements": "WG-SAF-02",
+      "check": "Buzzer never sounds longer than 10 s continuously"
+    },
+    {
+      "requirements": "WG-SAF-03",
+      "check": "Induced hang (FirmGen breakpoint / test hook) -> task watchdog reboots the board"
+    },
+    {
+      "requirements": "WG-SAF-04",
+      "check": "Stop the broker: amber DEGRADED within 5 s; restart: recovers and re-subscribes"
+    },
+    {
+      "requirements": "WG-CON-01",
+      "check": "Power-cycle the router: node rejoins Wi-Fi and MQTT without a reset"
+    },
+    {
+      "requirements": "WG-SEN-01",
+      "check": "Unplug HC-SR04: error counted in telemetry, no crash"
+    },
+    {
+      "requirements": "WG-NFR-02",
+      "check": "30-min soak: heap_min in telemetry stays above 40 KB"
+    }
+  ]
+}

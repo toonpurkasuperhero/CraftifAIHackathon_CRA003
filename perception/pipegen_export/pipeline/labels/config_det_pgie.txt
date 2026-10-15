@@ -1,0 +1,5 @@
+tapir
+jaguarundi
+maned_wolf
+puma
+giant_anteater

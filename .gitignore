@@ -1,0 +1,44 @@
+# secrets
+.env
+*.env.local
+backend/.env
+bridge/.env
+frontend/.env.local
+broker/passwd
+sdkconfig
+sdkconfig.old
+
+# runtime data
+*.db
+*.db-wal
+*.db-shm
+logs/
+bridge/logs/
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# build outputs
+node_modules/
+frontend/dist/
+*.engine
+*.plan
+perception/export/
+perception/pipegen_export/**/*.engine
+perception/calibration_list.txt
+
+# large / regenerable model + dataset files
+# best.pt is kept (needed by perception/export_onnx.sh). Attach engines/ONNX to a release instead.
+training/yolov8n.pt
+training/runs/**/last.pt
+training/runs/**/best.onnx
+training/BRA_YOLO/
+training/archive/Dataset/images/
+training/archive/Dataset/labels/
+
+# root-owned original of the PipeGen export (a user-owned copy lives in perception/pipegen_export/)
+/pipegen-yolo-wildlife-tracking-and-mqtt/
+# PipeGen archive duplicates perception/pipegen_export/
+perception/*.tar.gz
+# bridge / tool logs
+docs/evidence/video_test/_bridge_logs/

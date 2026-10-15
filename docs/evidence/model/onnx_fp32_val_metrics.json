@@ -1,0 +1,238 @@
+{
+  "generated": "2026-10-15 19:51:26",
+  "model": "training/runs/detect/train3/weights/best.onnx (YOLOv8n, 5 classes, 640)",
+  "runtime": "ONNX Runtime CPU, FP32 (offline reference, not the live system)",
+  "split": "val",
+  "images": 182,
+  "instances": 200,
+  "map50": 0.744,
+  "map50_95": 0.503,
+  "precision@0.5": 0.826,
+  "recall@0.5": 0.595,
+  "cpu_latency_ms": {
+    "p50": 15.1,
+    "p95": 18.2
+  },
+  "per_class": [
+    {
+      "class": "tapir",
+      "instances": 41,
+      "ap50": 0.689,
+      "ap50_95": 0.486,
+      "precision@0.5": 0.875,
+      "recall@0.5": 0.512
+    },
+    {
+      "class": "jaguarundi",
+      "instances": 31,
+      "ap50": 0.801,
+      "ap50_95": 0.503,
+      "precision@0.5": 0.92,
+      "recall@0.5": 0.742
+    },
+    {
+      "class": "maned_wolf",
+      "instances": 42,
+      "ap50": 0.725,
+      "ap50_95": 0.52,
+      "precision@0.5": 0.929,
+      "recall@0.5": 0.619
+    },
+    {
+      "class": "puma",
+      "instances": 51,
+      "ap50": 0.751,
+      "ap50_95": 0.453,
+      "precision@0.5": 0.651,
+      "recall@0.5": 0.549
+    },
+    {
+      "class": "giant_anteater",
+      "instances": 35,
+      "ap50": 0.753,
+      "ap50_95": 0.555,
+      "precision@0.5": 0.875,
+      "recall@0.5": 0.6
+    }
+  ],
+  "confusion_at_alert_conf": {
+    "rows_pred": [
+      "tapir",
+      "jaguarundi",
+      "maned_wolf",
+      "puma",
+      "giant_anteater",
+      "missed (background)"
+    ],
+    "cols_gt": [
+      "tapir",
+      "jaguarundi",
+      "maned_wolf",
+      "puma",
+      "giant_anteater",
+      "false positive (background)"
+    ],
+    "matrix": [
+      [
+        21,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      [
+        0,
+        23,
+        0,
+        0,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        26,
+        0,
+        0,
+        2
+      ],
+      [
+        3,
+        3,
+        4,
+        28,
+        0,
+        5
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        21,
+        2
+      ],
+      [
+        16,
+        5,
+        11,
+        22,
+        13,
+        0
+      ]
+    ]
+  },
+  "threshold_sweep": {
+    "tapir": {
+      "0.3": {
+        "precision": 0.8,
+        "recall": 0.59
+      },
+      "0.4": {
+        "precision": 0.81,
+        "recall": 0.54
+      },
+      "0.5": {
+        "precision": 0.88,
+        "recall": 0.51
+      },
+      "0.6": {
+        "precision": 0.95,
+        "recall": 0.46
+      },
+      "0.7": {
+        "precision": 0.94,
+        "recall": 0.41
+      }
+    },
+    "jaguarundi": {
+      "0.3": {
+        "precision": 0.8,
+        "recall": 0.77
+      },
+      "0.4": {
+        "precision": 0.92,
+        "recall": 0.74
+      },
+      "0.5": {
+        "precision": 0.92,
+        "recall": 0.74
+      },
+      "0.6": {
+        "precision": 0.92,
+        "recall": 0.71
+      },
+      "0.7": {
+        "precision": 0.91,
+        "recall": 0.65
+      }
+    },
+    "maned_wolf": {
+      "0.3": {
+        "precision": 0.87,
+        "recall": 0.64
+      },
+      "0.4": {
+        "precision": 0.93,
+        "recall": 0.64
+      },
+      "0.5": {
+        "precision": 0.93,
+        "recall": 0.62
+      },
+      "0.6": {
+        "precision": 0.96,
+        "recall": 0.57
+      },
+      "0.7": {
+        "precision": 0.95,
+        "recall": 0.48
+      }
+    },
+    "puma": {
+      "0.3": {
+        "precision": 0.56,
+        "recall": 0.76
+      },
+      "0.4": {
+        "precision": 0.62,
+        "recall": 0.65
+      },
+      "0.5": {
+        "precision": 0.65,
+        "recall": 0.55
+      },
+      "0.6": {
+        "precision": 0.78,
+        "recall": 0.55
+      },
+      "0.7": {
+        "precision": 0.84,
+        "recall": 0.51
+      }
+    },
+    "giant_anteater": {
+      "0.3": {
+        "precision": 0.79,
+        "recall": 0.66
+      },
+      "0.4": {
+        "precision": 0.81,
+        "recall": 0.6
+      },
+      "0.5": {
+        "precision": 0.88,
+        "recall": 0.6
+      },
+      "0.6": {
+        "precision": 0.91,
+        "recall": 0.6
+      },
+      "0.7": {
+        "precision": 0.94,
+        "recall": 0.49
+      }
+    }
+  }
+}

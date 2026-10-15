@@ -1,0 +1,279 @@
+{
+  "generated": "2026-10-15 21:24:11",
+  "detector": "ONNX FP32 reference on CPU (same weights PipeGen compiles to TensorRT)",
+  "bridge": "bridge/bridge.py logic, frame clock, default thresholds",
+  "results": [
+    {
+      "event_classes_without_veto": {
+        "tapir": 2
+      },
+      "clip": "tapir_trailcam",
+      "expect": "tapir",
+      "frames": 300,
+      "fps": 30.0,
+      "duration_s": 10.0,
+      "frames_with_expected_at_alert_conf": 1.0,
+      "frames_with_each_class_at_alert_conf": {
+        "tapir": 300
+      },
+      "events": [
+        {
+          "t_s": 0.53,
+          "class": "tapir",
+          "conf": 0.949,
+          "track": 1
+        },
+        {
+          "t_s": 5.53,
+          "class": "tapir",
+          "conf": 0.895,
+          "track": 1
+        }
+      ],
+      "event_classes": {
+        "tapir": 2
+      },
+      "time_to_first_correct_alert_s": 0.53,
+      "wrong_class_events": 0,
+      "verdict": "PASS",
+      "bridge_drops": {
+        "dropped_not_target": 0,
+        "dropped_low_conf": 0,
+        "dropped_outside_zone": 0,
+        "dropped_streak": 15,
+        "dropped_cooldown": 283,
+        "dropped_veto": 0
+      }
+    },
+    {
+      "event_classes_without_veto": {
+        "giant_anteater": 2
+      },
+      "clip": "anteater_trailcam",
+      "expect": "giant_anteater",
+      "frames": 300,
+      "fps": 30.0,
+      "duration_s": 10.0,
+      "frames_with_expected_at_alert_conf": 0.63,
+      "frames_with_each_class_at_alert_conf": {
+        "giant_anteater": 189
+      },
+      "events": [
+        {
+          "t_s": 0.53,
+          "class": "giant_anteater",
+          "conf": 0.841,
+          "track": 1
+        },
+        {
+          "t_s": 5.53,
+          "class": "giant_anteater",
+          "conf": 0.741,
+          "track": 1
+        }
+      ],
+      "event_classes": {
+        "giant_anteater": 2
+      },
+      "time_to_first_correct_alert_s": 0.53,
+      "wrong_class_events": 0,
+      "verdict": "PASS",
+      "bridge_drops": {
+        "dropped_not_target": 0,
+        "dropped_low_conf": 14,
+        "dropped_outside_zone": 0,
+        "dropped_streak": 15,
+        "dropped_cooldown": 172,
+        "dropped_veto": 0
+      }
+    },
+    {
+      "event_classes_without_veto": {
+        "jaguarundi": 1
+      },
+      "clip": "jaguarundi_trailcam",
+      "expect": "jaguarundi",
+      "frames": 450,
+      "fps": 30.0,
+      "duration_s": 15.0,
+      "frames_with_expected_at_alert_conf": 0.198,
+      "frames_with_each_class_at_alert_conf": {
+        "jaguarundi": 89,
+        "puma": 4
+      },
+      "events": [
+        {
+          "t_s": 0.53,
+          "class": "jaguarundi",
+          "conf": 0.738,
+          "track": 1
+        }
+      ],
+      "event_classes": {
+        "jaguarundi": 1
+      },
+      "time_to_first_correct_alert_s": 0.53,
+      "wrong_class_events": 0,
+      "verdict": "PASS",
+      "bridge_drops": {
+        "dropped_not_target": 0,
+        "dropped_low_conf": 62,
+        "dropped_outside_zone": 0,
+        "dropped_streak": 24,
+        "dropped_cooldown": 68,
+        "dropped_veto": 0
+      }
+    },
+    {
+      "event_classes_without_veto": {
+        "puma": 1
+      },
+      "clip": "puma_atlantic",
+      "expect": "puma",
+      "frames": 300,
+      "fps": 30.0,
+      "duration_s": 10.0,
+      "frames_with_expected_at_alert_conf": 0.487,
+      "frames_with_each_class_at_alert_conf": {
+        "puma": 146,
+        "tapir": 6
+      },
+      "events": [
+        {
+          "t_s": 1.9,
+          "class": "puma",
+          "conf": 0.939,
+          "track": 1
+        }
+      ],
+      "event_classes": {
+        "puma": 1
+      },
+      "time_to_first_correct_alert_s": 1.9,
+      "wrong_class_events": 0,
+      "verdict": "PASS",
+      "bridge_drops": {
+        "dropped_not_target": 0,
+        "dropped_low_conf": 26,
+        "dropped_outside_zone": 0,
+        "dropped_streak": 21,
+        "dropped_cooldown": 65,
+        "dropped_veto": 65
+      }
+    },
+    {
+      "event_classes_without_veto": {
+        "maned_wolf": 2,
+        "puma": 2
+      },
+      "clip": "maned_wolf_zoo",
+      "expect": "maned_wolf",
+      "frames": 345,
+      "fps": 30.0,
+      "duration_s": 11.5,
+      "frames_with_expected_at_alert_conf": 0.096,
+      "frames_with_each_class_at_alert_conf": {
+        "maned_wolf": 33,
+        "puma": 50
+      },
+      "events": [
+        {
+          "t_s": 1.73,
+          "class": "maned_wolf",
+          "conf": 0.605,
+          "track": 1
+        },
+        {
+          "t_s": 2.53,
+          "class": "puma",
+          "conf": 0.727,
+          "track": 2
+        },
+        {
+          "t_s": 10.77,
+          "class": "puma",
+          "conf": 0.678,
+          "track": 3
+        },
+        {
+          "t_s": 11.13,
+          "class": "maned_wolf",
+          "conf": 0.505,
+          "track": 6
+        }
+      ],
+      "event_classes": {
+        "maned_wolf": 2,
+        "puma": 2
+      },
+      "time_to_first_correct_alert_s": 1.73,
+      "wrong_class_events": 2,
+      "verdict": "PASS, with wrong-class alerts",
+      "bridge_drops": {
+        "dropped_not_target": 0,
+        "dropped_low_conf": 139,
+        "dropped_outside_zone": 0,
+        "dropped_streak": 50,
+        "dropped_cooldown": 27,
+        "dropped_veto": 2
+      }
+    },
+    {
+      "event_classes_without_veto": {
+        "maned_wolf": 2
+      },
+      "clip": "negative_cat",
+      "expect": "none",
+      "frames": 270,
+      "fps": 30.0,
+      "duration_s": 9.0,
+      "frames_with_expected_at_alert_conf": null,
+      "frames_with_each_class_at_alert_conf": {
+        "maned_wolf": 211,
+        "tapir": 7
+      },
+      "events": [],
+      "event_classes": {},
+      "time_to_first_correct_alert_s": null,
+      "wrong_class_events": 0,
+      "verdict": "PASS (no alert)",
+      "bridge_drops": {
+        "dropped_not_target": 0,
+        "dropped_low_conf": 52,
+        "dropped_outside_zone": 0,
+        "dropped_streak": 20,
+        "dropped_cooldown": 0,
+        "dropped_veto": 198
+      }
+    },
+    {
+      "event_classes_without_veto": {
+        "maned_wolf": 4
+      },
+      "clip": "negative_dog",
+      "expect": "none",
+      "frames": 1420,
+      "fps": 30.0,
+      "duration_s": 47.3,
+      "frames_with_expected_at_alert_conf": null,
+      "frames_with_each_class_at_alert_conf": {
+        "puma": 4,
+        "maned_wolf": 61,
+        "tapir": 2
+      },
+      "events": [],
+      "event_classes": {},
+      "time_to_first_correct_alert_s": null,
+      "wrong_class_events": 0,
+      "verdict": "PASS (no alert)",
+      "bridge_drops": {
+        "dropped_not_target": 0,
+        "dropped_low_conf": 394,
+        "dropped_outside_zone": 0,
+        "dropped_streak": 35,
+        "dropped_cooldown": 0,
+        "dropped_veto": 32
+      }
+    }
+  ]
+}

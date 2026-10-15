@@ -1,0 +1,6 @@
+# tools/: acceptance runner + simulator need only paho-mqtt.
+paho-mqtt==2.1.0
+# Rehearsal replay (tools/pipegen_replay.py) and offline evaluation (tools/eval_model.py):
+onnxruntime>=1.18
+opencv-python-headless>=4.9
+numpy>=1.26

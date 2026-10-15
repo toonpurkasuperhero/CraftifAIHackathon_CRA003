@@ -1,0 +1,23 @@
+{
+  "_comment": "Copy to pipeline_info.json and fill ONLY with numbers from PipeGen's own reports (Compiler stage speed report, Run stage). Leave null if not measured. The dashboard Analytics page and the evidence pack read this file.",
+  "pipegen_version": "0.5.1",
+  "hardware": { "device": null, "gpu": null, "jetpack_or_driver": null, "tensorrt": null, "deepstream": null },
+  "model": {
+    "name": "YOLOv8n BRA-5",
+    "onnx": "perception/export/wildguard_yolov8n_bra5.onnx",
+    "input": "1x3x640x640",
+    "classes": ["tapir", "jaguarundi", "maned_wolf", "puma", "giant_anteater"]
+  },
+  "pipeline": {
+    "source": "USB camera /dev/video0",
+    "stages": ["source", "preprocess", "nvinfer (TensorRT)", "tracker", "ROI analytics", "MQTT + JSON + RTSP sinks"],
+    "mqtt_topic": "wildguard/pipegen/raw"
+  },
+  "live_engine": { "precision": "FP16", "fps": null, "latency_ms": null },
+  "precisions": [
+    { "precision": "FP32", "fps": null, "latency_ms": null, "power_w": null, "map50": null, "map50_95": null },
+    { "precision": "FP16", "fps": null, "latency_ms": null, "power_w": null, "map50": null, "map50_95": null },
+    { "precision": "INT8", "fps": null, "latency_ms": null, "power_w": null, "map50": null, "map50_95": null, "calibration_images": 400 }
+  ],
+  "baseline_pytorch": { "map50": 0.768, "map50_95": 0.524, "source": "training/runs/detect/train3/results.csv, epoch 10" }
+}

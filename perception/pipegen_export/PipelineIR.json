@@ -1,0 +1,669 @@
+{
+  "loop": {
+    "next_file": null,
+    "next_task": null,
+    "projectTree": {},
+    "target_function": {
+      "name": "read_file",
+      "parameters": {}
+    },
+    "visited_steps": [
+      "scene_steps/frame_conditioning_11bbafe058.py",
+      "models/wildguard_yolov8n_bra5.onnx",
+      "Documents/Pranjal/animal_detection/perception/export/wildguard_yolov8n_bra5_labels.txt",
+      "Documents/Pranjal/animal_detection/perception/labels.txt",
+      "Documents/Pranjal/animal_detection/perception/README.md",
+      "Documents/Pranjal/animal_detection/perception/test_videos/fetch_test_videos.py",
+      "Documents/Pranjal/animal_detection/perception/export_onnx.sh"
+    ]
+  },
+  "pipeline_ir": {
+    "connections": [
+      [
+        "p01o_frame",
+        "p02i_frame"
+      ],
+      [
+        "p01o_meta",
+        "p06i_meta"
+      ],
+      [
+        "p02o_frame",
+        "p03i_frame"
+      ],
+      [
+        "p02o_frame",
+        "p05i_frame"
+      ],
+      [
+        "p02o_frame",
+        "p06i_frame"
+      ],
+      [
+        "p03o_tensor",
+        "p04i_tensor"
+      ],
+      [
+        "p03o_geometry",
+        "p05i_geometry"
+      ],
+      [
+        "p04o_tensor",
+        "p05i_tensor"
+      ],
+      [
+        "p05o_detections",
+        "p06i_detections"
+      ],
+      [
+        "p06o_meta",
+        "p07i_meta"
+      ],
+      [
+        "p06o_meta",
+        "p08i_meta"
+      ],
+      [
+        "p06o_frame",
+        "p09i_frame"
+      ]
+    ],
+    "nodes": [
+      {
+        "description": "Read every video frame with its source timing.",
+        "id": 1,
+        "name": "file",
+        "ports": [
+          {
+            "direction": "output",
+            "format": {
+              "color": "BGR",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p01o_frame",
+            "tensor": {
+              "dtype": "uint8",
+              "shape": [
+                720,
+                1280,
+                3
+              ]
+            }
+          },
+          {
+            "direction": "output",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p01o_meta",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          }
+        ],
+        "pseudo_code": "cap = cv2.VideoCapture('wildguard_media/wildguard_demo_reel.mp4')\nif not cap.isOpened(): raise OSError('Cannot open video input')\nindex = 0\nwhile True:\n    ok, frame = cap.read()\n    if not ok: break\n    if frame.shape[:2] != (720, 1280): raise ValueError('Unexpected source frame dimensions')\n    pts_ms = cap.get(cv2.CAP_PROP_POS_MSEC)\n    timestamp_s = pts_ms / 1000.0 if np.isfinite(pts_ms) and pts_ms >= 0 else index / 30.0\n    emit(p01o_frame=frame, p01o_meta={'input_id': 'input1', 'frame_index': index, 'timestamp_s': float(timestamp_s)})\n    index += 1\ncap.release()",
+        "resolution": [
+          1280,
+          720
+        ],
+        "type": "input",
+        "url": "file://wildguard_media/wildguard_demo_reel.mp4"
+      },
+      {
+        "category": "pre_nn_conditioning",
+        "description": "Condition dark-frame luma before detection and display.",
+        "external_assets": [],
+        "id": 2,
+        "inputs": [
+          "image"
+        ],
+        "name": "CLAHE",
+        "outputs": [
+          "image"
+        ],
+        "parameters": {
+          "ops": [
+            {
+              "clip_limit": 2.0,
+              "op": "clahe_luma",
+              "tiles": [
+                8,
+                8
+              ]
+            }
+          ],
+          "ramp": {
+            "full": 0.15,
+            "measure": "p50",
+            "off": 0.3
+          }
+        },
+        "placement": {
+          "attach_point": null,
+          "position": "pre_pgie"
+        },
+        "ports": [
+          {
+            "direction": "input",
+            "format": {
+              "color": "BGR",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p02i_frame",
+            "tensor": {
+              "dtype": "uint8",
+              "shape": [
+                720,
+                1280,
+                3
+              ]
+            }
+          },
+          {
+            "direction": "output",
+            "format": {
+              "color": "BGR",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p02o_frame",
+            "tensor": {
+              "dtype": "uint8",
+              "shape": [
+                720,
+                1280,
+                3
+              ]
+            }
+          }
+        ],
+        "pseudo_code": "def process_frame(frame, parameters):\n    h, w = frame.shape[:2]\n    # Adapt the reference's NV12 plane interface to this BGR image port.\n    planar = cv2.cvtColor(frame, cv2.COLOR_BGR2YUV_I420).reshape(-1)\n    y = planar[:h*w].reshape(h, w).copy()\n    u = planar[h*w:h*w+h*w//4].reshape(h//2, w//2)\n    v = planar[h*w+h*w//4:].reshape(h//2, w//2)\n    uv = np.stack((u, v), axis=-1).astype(np.uint8)\n    incoming_y = y.copy()\n    def measure(name):\n        if name == 'chroma_offset':\n            a, b = uv[::4, ::4].reshape(-1, 2).astype(np.float32).mean(axis=0) - 128.0\n            return float(np.hypot(a, b) / 128.0)\n        luma = (incoming_y[::4, ::4].astype(np.float32) - 16.0) / 219.0\n        if name == 'p50': return float(np.median(luma))\n        if name == 'dark_fraction': return float(np.mean(luma < 0.12))\n        if name == 'clipped_fraction': return float(np.mean(luma >= 0.98))\n        if name == 'rms_contrast': return float(luma.std())\n        raise ValueError('unknown measure ' + repr(name))\n    def strength(ramp):\n        if not ramp: return 1.0\n        best = 0.0\n        for rule in ramp if isinstance(ramp, list) else [ramp]:\n            gate = rule.get('only_if')\n            if gate and measure(gate['measure']) < gate['min']: continue\n            m = measure(rule['measure'])\n            s = (rule['off'] - m) / (rule['off'] - rule['full'])\n            best = max(best, min(max(s, 0.0), 1.0))\n        return best\n    ops = parameters.get('ops') or []\n    for op in ops:\n        if op['op'] != 'clahe_luma': raise ValueError('unknown op ' + repr(op['op']))\n    strengths = [strength(op.get('ramp', parameters.get('ramp'))) for op in ops]\n    if all(s <= 0.0 for s in strengths): return frame.copy()\n    for op, s in zip(ops, strengths):\n        if s <= 0.0: continue\n        clahe = cv2.createCLAHE(clipLimit=float(op.get('clip_limit', 2.0)), tileGridSize=tuple(map(int, op.get('tiles', [8, 8]))))\n        fixed = clahe.apply(np.ascontiguousarray(y))\n        y[...] = fixed if s >= 1.0 else cv2.addWeighted(np.ascontiguousarray(y), 1.0-s, fixed, s, 0.0)\n    return cv2.cvtColorTwoPlane(y, uv, cv2.COLOR_YUV2BGR_NV12)\n\nreturn process_frame(p02i_frame, parameters)",
+        "reference_path": "scene_steps/frame_conditioning_11bbafe058.py",
+        "runs_every_frame": true,
+        "state_key": "none",
+        "triggers": [],
+        "type": "custom"
+      },
+      {
+        "color_order": "RGB",
+        "description": "Letterbox conditioned pixels and form normalized RGB tensors.",
+        "id": 3,
+        "mean": null,
+        "normalization": 0.00392156862745098,
+        "offset": null,
+        "pad_value": 114,
+        "ports": [
+          {
+            "direction": "input",
+            "format": {
+              "color": "BGR",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p03i_frame",
+            "tensor": {
+              "dtype": "uint8",
+              "shape": [
+                720,
+                1280,
+                3
+              ]
+            }
+          },
+          {
+            "direction": "output",
+            "format": {
+              "color": "RGB",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p03o_tensor",
+            "tensor": {
+              "dtype": "fp32",
+              "shape": [
+                1,
+                3,
+                640,
+                640
+              ]
+            }
+          },
+          {
+            "direction": "output",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p03o_geometry",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          }
+        ],
+        "pseudo_code": "frame = p03i_frame\nh, w = frame.shape[:2]\ngain = min(640 / h, 640 / w)\nnew_w, new_h = round(w * gain), round(h * gain)\nresized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)\ndw, dh = (640 - new_w) / 2, (640 - new_h) / 2\nleft, right = round(dw - 0.1), round(dw + 0.1)\ntop, bottom = round(dh - 0.1), round(dh + 0.1)\npadded = cv2.copyMakeBorder(resized, top, bottom, left, right, cv2.BORDER_CONSTANT, value=(114, 114, 114))\nrgb = cv2.cvtColor(padded, cv2.COLOR_BGR2RGB)\ntensor = np.ascontiguousarray(rgb.transpose(2, 0, 1)[None]).astype(np.float32) / 255.0\nreturn tensor, {'width': w, 'height': h, 'gain': gain, 'pad_left': left, 'pad_top': top}",
+        "resize": [
+          640,
+          640
+        ],
+        "resize_mode": "letterbox",
+        "scale": 0.00392156862745098,
+        "std": null,
+        "type": "preprocess"
+      },
+      {
+        "batchSize": 1,
+        "description": "Run the selected five-species YOLOv8 ONNX detector.",
+        "id": 4,
+        "layout": "NCHW",
+        "model": {
+          "inputs": [
+            {
+              "dtype": "fp32",
+              "name": "images",
+              "shape": [
+                1,
+                3,
+                640,
+                640
+              ]
+            }
+          ],
+          "name": "wildguard_yolov8n_bra5",
+          "outputs": [
+            {
+              "dtype": "fp32",
+              "name": "output0",
+              "shape": [
+                1,
+                9,
+                8400
+              ]
+            }
+          ],
+          "parameter_count": 3048645,
+          "type": "engine",
+          "url": "models/wildguard_yolov8n_bra5.fp16.plan",
+          "source_onnx": "models/wildguard_yolov8n_bra5.onnx"
+        },
+        "ports": [
+          {
+            "direction": "input",
+            "format": {
+              "color": "RGB",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p04i_tensor",
+            "tensor": {
+              "dtype": "fp32",
+              "shape": [
+                1,
+                3,
+                640,
+                640
+              ]
+            }
+          },
+          {
+            "direction": "output",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p04o_tensor",
+            "tensor": {
+              "dtype": "fp32",
+              "shape": [
+                1,
+                9,
+                8400
+              ]
+            }
+          }
+        ],
+        "pseudo_code": "session = onnxruntime.InferenceSession('models/wildguard_yolov8n_bra5.onnx')\noutput0 = session.run(['output0'], {'images': p04i_tensor})[0]\nif output0.shape != (1, 9, 8400): raise ValueError('Unexpected detector output shape')\nreturn output0",
+        "type": "inference"
+      },
+      {
+        "description": "Decode five-class boxes and suppress overlapping detections.",
+        "id": 5,
+        "label_file_path": "file://Documents/Pranjal/animal_detection/perception/export/wildguard_yolov8n_bra5_labels.txt",
+        "num_classes": 5,
+        "ports": [
+          {
+            "direction": "input",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p05i_tensor",
+            "tensor": {
+              "dtype": "fp32",
+              "shape": [
+                1,
+                9,
+                8400
+              ]
+            }
+          },
+          {
+            "direction": "input",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p05i_geometry",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          },
+          {
+            "direction": "input",
+            "format": {
+              "color": "BGR",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p05i_frame",
+            "tensor": {
+              "dtype": "uint8",
+              "shape": [
+                720,
+                1280,
+                3
+              ]
+            }
+          },
+          {
+            "direction": "output",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p05o_detections",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          }
+        ],
+        "pseudo_code": "labels = ['tapir', 'jaguarundi', 'maned_wolf', 'puma', 'giant_anteater']\nraw = p05i_tensor\ngeo = p05i_geometry\nframe = p05i_frame\nif (geo['height'], geo['width']) != frame.shape[:2]: raise ValueError('Frame and letterbox geometry disagree')\nif raw.shape != (1, 9, 8400): raise ValueError('Unexpected YOLO output')\n# YOLOv8 detect head: 8400 columns, each [cx,cy,w,h,class0,...,class4]; no objectness channel and no embedded NMS.\npredictions = raw[0].T\ncandidates = [[] for _ in range(5)]\nfor row in predictions:\n    class_id = int(np.argmax(row[4:9]))\n    confidence = float(row[4 + class_id])\n    if not np.isfinite(confidence) or confidence < 0.35: continue\n    cx, cy, bw, bh = map(float, row[:4])\n    if not all(np.isfinite(v) for v in (cx, cy, bw, bh)) or bw <= 0 or bh <= 0: continue\n    x1 = max(0.0, min(float(geo['width']), (cx - bw / 2 - geo['pad_left']) / geo['gain']))\n    y1 = max(0.0, min(float(geo['height']), (cy - bh / 2 - geo['pad_top']) / geo['gain']))\n    x2 = max(0.0, min(float(geo['width']), (cx + bw / 2 - geo['pad_left']) / geo['gain']))\n    y2 = max(0.0, min(float(geo['height']), (cy + bh / 2 - geo['pad_top']) / geo['gain']))\n    if x2 <= x1 or y2 <= y1: continue\n    candidates[class_id].append({'class_id': class_id, 'label': labels[class_id], 'confidence': confidence, 'bbox_xyxy': [x1, y1, x2, y2]})\ndef iou(a, b):\n    ax1, ay1, ax2, ay2 = a\n    bx1, by1, bx2, by2 = b\n    intersection = max(0.0, min(ax2, bx2) - max(ax1, bx1)) * max(0.0, min(ay2, by2) - max(ay1, by1))\n    area_a = (ax2-ax1)*(ay2-ay1)\n    area_b = (bx2-bx1)*(by2-by1)\n    return intersection / (area_a+area_b-intersection) if area_a+area_b-intersection > 0 else 0.0\ndetections = []\nfor class_candidates in candidates:\n    remaining = sorted(class_candidates, key=lambda d: d['confidence'], reverse=True)\n    while remaining:\n        winner = remaining.pop(0)\n        detections.append(winner)\n        remaining = [d for d in remaining if iou(winner['bbox_xyxy'], d['bbox_xyxy']) <= 0.45]\nreturn detections",
+        "task": "detection",
+        "threshold": 0.35,
+        "top_items": null,
+        "type": "postprocess"
+      },
+      {
+        "category": "tracking",
+        "description": "Associate current animal boxes and annotate conditioned frames.",
+        "external_assets": [],
+        "id": 6,
+        "inputs": [
+          "bbox",
+          "image",
+          "metadata"
+        ],
+        "name": "animal tracking",
+        "outputs": [
+          "image",
+          "metadata"
+        ],
+        "parameters": {
+          "iou_threshold": 0.3,
+          "max_age_frames": 30,
+          "method": "multi-object tracker"
+        },
+        "placement": {
+          "attach_point": null,
+          "position": "post_nn"
+        },
+        "ports": [
+          {
+            "direction": "input",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p06i_detections",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          },
+          {
+            "direction": "input",
+            "format": {
+              "color": "BGR",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p06i_frame",
+            "tensor": {
+              "dtype": "uint8",
+              "shape": [
+                720,
+                1280,
+                3
+              ]
+            }
+          },
+          {
+            "direction": "input",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p06i_meta",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          },
+          {
+            "direction": "output",
+            "format": {
+              "color": "BGR",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p06o_frame",
+            "tensor": {
+              "dtype": "uint8",
+              "shape": [
+                720,
+                1280,
+                3
+              ]
+            }
+          },
+          {
+            "direction": "output",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p06o_meta",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          }
+        ],
+        "pseudo_code": "# Initialize once for this input; retain association state across every frame.\ntracks = {}  # track_id -> {'class_id', 'bbox_xyxy', 'last_frame'}\nnext_track_id = 1\ndef box_iou(a, b):\n    x1 = max(a[0], b[0]); y1 = max(a[1], b[1])\n    x2 = min(a[2], b[2]); y2 = min(a[3], b[3])\n    intersection = max(0.0, x2-x1) * max(0.0, y2-y1)\n    aa = max(0.0, a[2]-a[0]) * max(0.0, a[3]-a[1])\n    bb = max(0.0, b[2]-b[0]) * max(0.0, b[3]-b[1])\n    return intersection / (aa+bb-intersection) if aa+bb-intersection > 0 else 0.0\n\ndef process(detections, frame, source_meta, parameters):\n    global next_track_id\n    index = source_meta['frame_index']\n    max_age = int(parameters['max_age_frames'])\n    threshold = float(parameters['iou_threshold'])\n    for track_id in list(tracks):\n        if index - tracks[track_id]['last_frame'] > max_age: del tracks[track_id]\n    pairs = []\n    for di, detection in enumerate(detections):\n        for track_id, track in tracks.items():\n            if track['class_id'] != detection['class_id']: continue\n            overlap = box_iou(track['bbox_xyxy'], detection['bbox_xyxy'])\n            if overlap >= threshold: pairs.append((overlap, di, track_id))\n    pairs.sort(key=lambda pair: (-pair[0], pair[1], pair[2]))\n    assigned = {}\n    used_tracks = set()\n    for overlap, di, track_id in pairs:\n        if di not in assigned and track_id not in used_tracks:\n            assigned[di] = track_id\n            used_tracks.add(track_id)\n    for di, detection in enumerate(detections):\n        if di not in assigned:\n            assigned[di] = next_track_id\n            next_track_id += 1\n        track_id = assigned[di]\n        tracks[track_id] = {'class_id': detection['class_id'], 'bbox_xyxy': list(detection['bbox_xyxy']), 'last_frame': index}\n    annotated = frame.copy()\n    objects = []\n    for di, detection in enumerate(detections):\n        track_id = assigned[di]\n        obj = {'track_id': track_id, 'class_id': detection['class_id'], 'label': detection['label'], 'confidence': detection['confidence'], 'bbox_xyxy': list(detection['bbox_xyxy'])}\n        objects.append(obj)\n        x1, y1, x2, y2 = (int(round(v)) for v in obj['bbox_xyxy'])\n        cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 255, 0), 2)\n        cv2.putText(annotated, f\"{obj['label']} #{track_id} {obj['confidence']:.2f}\", (x1, max(15, y1-6)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)\n    # Retained but unmatched IDs are not observations and are not emitted.\n    record = {'input_id': source_meta['input_id'], 'frame_index': index, 'timestamp_s': source_meta['timestamp_s'], 'objects': objects}\n    return annotated, record\n\nreturn process(p06i_detections, p06i_frame, p06i_meta, parameters)",
+        "reference_path": null,
+        "runs_every_frame": true,
+        "state_key": "global",
+        "triggers": [],
+        "type": "custom"
+      },
+      {
+        "description": "Publish every observed tracked animal as MQTT JSON.",
+        "grid": null,
+        "id": 7,
+        "mqtt": {
+          "interval": 1,
+          "payload": "object",
+          "skip_empty": true
+        },
+        "name": "mqtt",
+        "output_type": "single",
+        "ports": [
+          {
+            "direction": "input",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p07i_meta",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          }
+        ],
+        "pseudo_code": "topic = 'wildguard/pipegen/raw'\nclient.connect('localhost', 1883)\nrecord = p07i_meta\nfor obj in record['objects']:\n    payload = {'input_id': record['input_id'], 'frame_index': record['frame_index'], 'timestamp_s': record['timestamp_s'], **obj}\n    client.publish(topic, json.dumps(payload, separators=(',', ':')), qos=0)\n# Empty frames produce no per-animal messages.",
+        "resolution": null,
+        "type": "output",
+        "url": "mqtt://localhost:1883"
+      },
+      {
+        "description": "Save per-frame tracked-animal metadata including empty frames.",
+        "grid": null,
+        "id": 8,
+        "name": "json",
+        "output_type": "single",
+        "ports": [
+          {
+            "direction": "input",
+            "format": {
+              "color": null,
+              "encoding": null
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p08i_meta",
+            "tensor": {
+              "dtype": null,
+              "shape": null
+            }
+          }
+        ],
+        "pseudo_code": "path = 'output/metadata.json'\nos.makedirs(os.path.dirname(path), exist_ok=True)\n# Open once, before receiving frames.\nfile = open(path, 'w', encoding='utf-8')\nfile.write('[')\nfirst = True\n# For each p08i_meta record, including records whose objects list is empty:\nif not first: file.write(',')\nfile.write('\\n' + json.dumps(p08i_meta, ensure_ascii=False))\nfirst = False\nfile.flush()\n# On end of input, close the JSON array.\nfile.write('\\n]\\n')\nfile.close()",
+        "resolution": null,
+        "type": "output",
+        "url": "file://output/metadata.json"
+      },
+      {
+        "description": "Show conditioned video with current tracked-animal annotations.",
+        "grid": null,
+        "id": 9,
+        "name": "display",
+        "output_type": "single",
+        "ports": [
+          {
+            "direction": "input",
+            "format": {
+              "color": "BGR",
+              "encoding": "raw"
+            },
+            "framerate": {
+              "denominator": 1,
+              "numerator": 30
+            },
+            "id": "p09i_frame",
+            "tensor": {
+              "dtype": "uint8",
+              "shape": [
+                720,
+                1280,
+                3
+              ]
+            }
+          }
+        ],
+        "pseudo_code": "cv2.imshow('WildGuard', p09i_frame)\ncv2.waitKey(1)\n# Destroy the window when the source reaches EOF.",
+        "resolution": [
+          1280,
+          720
+        ],
+        "type": "output",
+        "url": null
+      }
+    ]
+  }
+}

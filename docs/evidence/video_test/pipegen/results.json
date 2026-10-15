@@ -1,0 +1,147 @@
+{
+  "generated": "2026-10-15 22:51:46",
+  "detector": "PipeGen TensorRT pipeline (JSON metadata)",
+  "bridge": "bridge/bridge.py logic, frame clock, default thresholds",
+  "results": [
+    {
+      "clip": "tapir_trailcam",
+      "expect": "tapir",
+      "duration_s": 10.0,
+      "frames_with_expected_at_alert_conf": null,
+      "event_classes": {
+        "tapir": 2
+      },
+      "event_classes_without_veto": null,
+      "time_to_first_correct_alert_s": 0.63,
+      "verdict": "PASS",
+      "events": [
+        {
+          "t_s": 0.63,
+          "class": "tapir",
+          "conf": 0.9
+        },
+        {
+          "t_s": 5.63,
+          "class": "tapir",
+          "conf": 0.822
+        }
+      ]
+    },
+    {
+      "clip": "anteater_trailcam",
+      "expect": "giant_anteater",
+      "duration_s": 10.0,
+      "frames_with_expected_at_alert_conf": null,
+      "event_classes": {
+        "giant_anteater": 2
+      },
+      "event_classes_without_veto": null,
+      "time_to_first_correct_alert_s": 0.63,
+      "verdict": "PASS",
+      "events": [
+        {
+          "t_s": 10.63,
+          "class": "giant_anteater",
+          "conf": 0.596
+        },
+        {
+          "t_s": 15.7,
+          "class": "giant_anteater",
+          "conf": 0.708
+        }
+      ]
+    },
+    {
+      "clip": "jaguarundi_trailcam",
+      "expect": "jaguarundi",
+      "duration_s": 15.0,
+      "frames_with_expected_at_alert_conf": null,
+      "event_classes": {
+        "jaguarundi": 1
+      },
+      "event_classes_without_veto": null,
+      "time_to_first_correct_alert_s": 0.63,
+      "verdict": "PASS",
+      "events": [
+        {
+          "t_s": 20.63,
+          "class": "jaguarundi",
+          "conf": 0.675
+        }
+      ]
+    },
+    {
+      "clip": "puma_atlantic",
+      "expect": "puma",
+      "duration_s": 10.0,
+      "frames_with_expected_at_alert_conf": null,
+      "event_classes": {
+        "puma": 1
+      },
+      "event_classes_without_veto": null,
+      "time_to_first_correct_alert_s": 0.63,
+      "verdict": "PASS",
+      "events": [
+        {
+          "t_s": 35.63,
+          "class": "puma",
+          "conf": 0.886
+        }
+      ]
+    },
+    {
+      "clip": "maned_wolf_zoo",
+      "expect": "maned_wolf",
+      "duration_s": 11.5,
+      "frames_with_expected_at_alert_conf": null,
+      "event_classes": {},
+      "event_classes_without_veto": null,
+      "time_to_first_correct_alert_s": null,
+      "verdict": "MISSED",
+      "events": []
+    },
+    {
+      "clip": "negative_cat",
+      "expect": "none",
+      "duration_s": 9.0,
+      "frames_with_expected_at_alert_conf": null,
+      "event_classes": {
+        "maned_wolf": 2
+      },
+      "event_classes_without_veto": null,
+      "time_to_first_correct_alert_s": null,
+      "verdict": "FALSE ALARM x2",
+      "events": [
+        {
+          "t_s": 57.23,
+          "class": "maned_wolf",
+          "conf": 0.527
+        },
+        {
+          "t_s": 62.23,
+          "class": "maned_wolf",
+          "conf": 0.658
+        }
+      ]
+    },
+    {
+      "clip": "negative_dog",
+      "expect": "none",
+      "duration_s": 47.3,
+      "frames_with_expected_at_alert_conf": null,
+      "event_classes": {
+        "maned_wolf": 1
+      },
+      "event_classes_without_veto": null,
+      "time_to_first_correct_alert_s": null,
+      "verdict": "FALSE ALARM x1",
+      "events": [
+        {
+          "t_s": 88.4,
+          "class": "maned_wolf",
+          "conf": 0.526
+        }
+      ]
+    }
+  ]
+}

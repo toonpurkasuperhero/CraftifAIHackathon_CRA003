@@ -1,0 +1,21 @@
+# BRA-Dataset (Brazilian Road Animals), YOLO format.
+# Paths are relative: run Ultralytics from the training/ folder, e.g.
+#   cd training && yolo detect train data=bra_dataset.yaml model=yolov8n.pt imgsz=640
+# Source: Ferrante et al., "Brazilian Road Animals (BRA): An Image Dataset of Most Commonly
+#         Run Over Animals", SIBGRAPI 2022, DOI 10.1109/SIBGRAPI55357.2022.9991774
+#         (see archive/README.md). Check the original repository for the licence before redistribution.
+# archive/Dataset holds images/ + labels/ and is what run train3 used. BRA_YOLO/ only has images.
+path: ./archive/Dataset
+
+train: images/train
+val: images/val
+test: images/test
+
+# Class order is part of the MQTT contract (class_id). Keep it in sync with
+# perception/labels.txt and shared/wg_contract.py.
+names:
+  0: tapir
+  1: jaguarundi
+  2: maned_wolf
+  3: puma
+  4: giant_anteater

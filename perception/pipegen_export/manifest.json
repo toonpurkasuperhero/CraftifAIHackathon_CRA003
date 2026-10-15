@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "project_name": "YOLO Wildlife Tracking and MQTT",
+  "project_id": "fc19a514-2825-4627-8f0c-e8f15e9d6afe",
+  "pipegen_version": "0.5.1",
+  "exported_at": "2026-10-15T17:15:54Z",
+  "origin": {
+    "gpu": "NVIDIA RTX 2000 Ada Generation",
+    "trt": "10.3.0",
+    "arch": "x86_64",
+    "image": "craftifaidocker/deepstream:7.1-amd64-v3",
+    "gpu_slug": "nvidia-rtx-2000-ada-generation"
+  },
+  "models": [
+    {
+      "name": "wildguard_yolov8n_bra5",
+      "onnx": "models/wildguard_yolov8n_bra5.onnx",
+      "plan": "models/wildguard_yolov8n_bra5.fp16.plan",
+      "precision": "fp16",
+      "workspace_mb": 1024,
+      "builder_optimization_level": 3,
+      "origin_builder_optimization_level": 0,
+      "onnx_sha256": "46776ea0f0aaca4df016e9652c38c167f018d90aca3a99c67aa6cf348e8fd956",
+      "plan_sha256": "f402b913a9c28bb1188c485bc98ea03b38a2d25ba29c5102e385a471d4193e58",
+      "engine_bytes": 10877716,
+      "layer_count": 174
+    }
+  ],
+  "io": {
+    "default_input_kind": "file",
+    "default_input": "wildguard_demo_reel.mp4",
+    "supported_inputs": [
+      "file",
+      "rtsp"
+    ],
+    "input_required": true,
+    "output_dir": "out",
+    "has_display_sink": true
+  },
+  "warnings": [
+    "the pipeline read wildguard_demo_reel.mp4, which lives outside the project and cannot be shipped \u2014 the recipient must pass --input"
+  ]
+}

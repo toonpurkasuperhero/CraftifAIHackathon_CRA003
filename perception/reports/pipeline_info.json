@@ -1,0 +1,76 @@
+{
+  "_comment": "Values copied from PipeGen v0.5.1 screens (perception/reports/*.png). null = not measured yet.",
+  "pipegen_version": "0.5.1",
+  "hardware": {
+    "device": "x86-64 PC, Ubuntu 24.04",
+    "gpu": "NVIDIA RTX 2000 Ada Generation (16 GB)",
+    "jetpack_or_driver": "driver 580.178.04",
+    "tensorrt": "10.3.0",
+    "deepstream": "7.1 (craftifaidocker/deepstream:7.1-amd64-v3)"
+  },
+  "model": {
+    "name": "YOLOv8n BRA-5 (custom, trained on the BRA dataset)",
+    "onnx": "perception/export/wildguard_yolov8n_bra5.onnx",
+    "input": "1x3x640x640",
+    "classes": [
+      "tapir",
+      "jaguarundi",
+      "maned_wolf",
+      "puma",
+      "giant_anteater"
+    ],
+    "onnx_check": {
+      "layers": 234,
+      "supported_on_tensorrt": 232,
+      "unresolved": 0
+    }
+  },
+  "pipeline": {
+    "source": "video file /home/cse-sdpl/wildguard_media/wildguard_demo_reel.mp4",
+    "stages": [
+      "video file source",
+      "preprocess (CLAHE for low light)",
+      "nvinfer custom YOLOv8n (TensorRT FP16)",
+      "detection decoding",
+      "tracker",
+      "MQTT + JSON metadata + live display"
+    ],
+    "mqtt_topic": "wildguard/pipegen/raw"
+  },
+  "live_engine": {
+    "precision": "FP16",
+    "build_time_s": 8.4,
+    "engine_mb": 10.9,
+    "trt_layers": 174,
+    "fps": 30.0,
+    "latency_ms": null,
+    "fps_note": "30.0-30.3 FPS rendered, 0 dropped; display sink is synced to the 30 FPS video, so this is the source rate, not the engine's ceiling"
+  },
+  "precisions": [
+    {
+      "precision": "FP16",
+      "fps": 30.0,
+      "latency_ms": null,
+      "power_w": null,
+      "map50": null,
+      "map50_95": null,
+      "agreement_with_fp32_onnx": "mAP50 1.000 / mAP50-95 1.000 / P 1.000 / R 1.000 on 30 samples (FP32 ONNX output as reference)"
+    }
+  ],
+  "baseline_pytorch": {
+    "map50": 0.768,
+    "map50_95": 0.524,
+    "source": "training/runs/detect/train3/results.csv, epoch 10"
+  },
+  "baseline_onnx_fp32_val": {
+    "map50": 0.744,
+    "map50_95": 0.503,
+    "source": "docs/evidence/model/onnx_fp32_val_metrics.md"
+  },
+  "pipegen_run_demo_reel": {
+    "species_alerted_correctly": "4/5 (tapir, giant anteater, jaguarundi, puma at 0.63 s)",
+    "missed": "maned_wolf (zoo footage behind fencing)",
+    "false_alarms": "cat clip x2, dog clip x1 (closed-set model; look-alike veto not in this single-model pipeline)",
+    "report": "docs/evidence/video_test/pipegen/report.md"
+  }
+}
