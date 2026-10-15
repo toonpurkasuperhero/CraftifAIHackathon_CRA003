@@ -11,6 +11,47 @@ USB camera → PipeGen (YOLOv8n · TensorRT · tracker · road-zone ROI) → MQT
 
 Details: [docs/project-description.md](docs/project-description.md) (submission text) · [docs/event-day-runbook.md](docs/event-day-runbook.md) · [docs/architecture.md](docs/architecture.md) · [docs/mqtt-contract.md](docs/mqtt-contract.md) · [firmware/prd/WildGuard_PRD.md](firmware/prd/WildGuard_PRD.md)
 
+## PipeGen pipeline: running, with its node graph
+
+▶ **Demo video (2 min 11 s):** [wildguard_demo.mp4](https://github.com/toonpurkasuperhero/CraftifAIHackathon_CRA003/releases/download/demo-video/wildguard_demo.mp4). It shows the PipeGen pipeline running on real wildlife footage, the alerts the bridge raises from its MQTT feed, the dashboard, and PipeGen's JSON output file. Also in the repository at [docs/evidence/demo/wildguard_demo.mp4](docs/evidence/demo/wildguard_demo.mp4).
+
+**Pipeline IR node graph** (PipeGen v0.5.1): video source → CLAHE preprocess → custom YOLOv8n (TensorRT FP16) → tracker → MQTT + JSON metadata + display
+
+![PipeGen Pipeline IR node graph](perception/screenshots/02_pipeline_ir.png)
+
+**Running:** TensorRT FP16 engine on an NVIDIA RTX 2000 Ada, 30 FPS, 0 dropped frames
+
+| Tapir | Jaguarundi | Puma |
+|---|---|---|
+| ![tapir](perception/screenshots/05_live_run_tapir_30fps.png) | ![jaguarundi](perception/screenshots/05d_live_run_jaguarundi.png) | ![puma](perception/screenshots/05e_live_run_puma.png) |
+
+![TensorRT FP16 engine compiled](perception/reports/04_fp16_tensorrt_engine_compiled.png)
+
+All PipeGen stage screenshots are listed in [perception/screenshots/README.md](perception/screenshots/README.md).
+
+### How to run the PipeGen export
+
+The PipeGen **Export Project** folder is [perception/pipegen_export/](perception/pipegen_export/). It is self-contained, and its own README is [perception/pipegen_export/README.md](perception/pipegen_export/README.md).
+
+Requirements: an NVIDIA GPU (driver 560.35.03 or newer), Docker with your user in the `docker` group, and the NVIDIA Container Toolkit. PipeGen, CUDA, TensorRT and DeepStream are **not** needed; `run.sh` fetches the container image on first run.
+
+```bash
+# 1. get the test footage (7 freely licensed clips -> /home/$USER/wildguard_media/wildguard_demo_reel.mp4)
+pip install imageio-ffmpeg            # or: sudo apt install ffmpeg
+python3 perception/test_videos/fetch_test_videos.py
+
+# 2. run the PipeGen pipeline (opens a window; add --headless to only write results)
+cd perception/pipegen_export
+./run.sh --input /home/$USER/wildguard_media/wildguard_demo_reel.mp4 --output ./out
+#    results: ./out/metadata.json (per-frame detections); MQTT on localhost:1883,
+#    topic pipegen/detection/wildguard-demo-reel (run a broker to receive it)
+
+# 3. optional: score PipeGen's output per clip through the WildGuard bridge logic
+cd ../.. && python3 tools/video_test.py --pipegen-json perception/pipegen_export/out/metadata.json
+```
+
+Any video file, `rtsp://` stream or camera (`--input /dev/video0`) works as input. The first run builds the parser libraries and prepares the TensorRT engine for your GPU, which takes about a minute.
+
 ## Why it matters
 
 Collisions with wildlife on Brazilian highways kill large numbers of tapirs and giant anteaters (both IUCN Vulnerable) and maned wolves (Near Threatened), and also injure drivers. Warning signs are static and get ignored. WildGuard turns the sign on **only when an animal is actually at the road**, so drivers learn to trust it.
@@ -23,7 +64,7 @@ Species: tapir, jaguarundi, maned wolf, puma, giant anteater ([BRA dataset](trai
 |---|---|---|
 | **PipeGen** | All perception: the five stages from Requirement to Run, TensorRT engine, tracker, ROI, MQTT/JSON/RTSP output. There is no other inference path in the live system. | Pipeline IR graph, TensorRT speed report, live run, sample payload in [perception/](perception/README.md) |
 | **FirmGen** | All action: the PRD with 30 requirements is frozen, then FirmGen generates ESP-IDF v5.5 firmware for validation, sensor fusion, species profiles, actuation, ACK, fail-safe and telemetry. | Frozen requirements, traceability report, UART log, HIL results in [firmware/](firmware/README.md) |
-| **Closed loop** | A PipeGen detection triggers a physical action on the board in real time. The ACK closes the loop back. | Live Loop page, evidence pack, demo clip |
+| **Closed loop** (goal) | A PipeGen detection triggers a physical action on the board in real time, and the ACK closes the loop. **Status:** PipeGen → MQTT → bridge → dashboard works (see the demo video). The ESP32 firmware is not built yet. | Demo video. Board evidence is pending |
 
 ## Repository layout
 
@@ -88,8 +129,9 @@ Fill these from measurements only (see [docs/evidence/README.md](docs/evidence/R
 |---|---|
 | YOLOv8n (Ultralytics val, 10 epochs) mAP50 / mAP50-95 | 0.768 / 0.524 |
 | ONNX FP32 baseline on val (`tools/eval_model.py`) mAP50 / mAP50-95 · precision / recall @ 0.5 | 0.744 / 0.503 · 0.826 / 0.595 ([per class](docs/evidence/model/onnx_fp32_val_metrics.md)) |
-| TensorRT engine and FPS (PipeGen report) | _TBD_ |
-| FP32 / FP16 / INT8 FPS and mAP | _TBD_ |
+| TensorRT engine and FPS (PipeGen report) | FP16, TensorRT 10.3.0, 10.9 MB, 174 layers; 30 FPS, 0 dropped (RTX 2000 Ada) |
+| FP16 engine vs FP32 ONNX output | 1.000 agreement on 30 samples (no accuracy lost) |
+| PipeGen run on 7 real wildlife clips | 4/5 species alerted correctly; maned wolf missed; 3 false alarms on cat/dog clips ([report](docs/evidence/video_test/pipegen/report.md)) |
 | Capture → ACK latency p50 / p95 | _TBD_ |
 | On-board receive → actuate (max) | _TBD_ (target 100 ms or less) |
 | HIL acceptance on the real ESP32 | _TBD_ / 19 |
