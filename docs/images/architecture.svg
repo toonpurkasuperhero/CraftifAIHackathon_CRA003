@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" width="1200" height="660" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="660" fill="#ffffff"/>
+  <text x="600" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">WildGuard AI: perception-to-action architecture</text>
+  <text x="600" y="58" text-anchor="middle" font-size="14" fill="#475569">Solid = built and demonstrated · Dashed = specified in the FirmGen PRD, not yet built</text>
+
+  <!-- input -->
+  <rect x="30" y="110" width="150" height="110" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="105" y="145" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">Input</text>
+  <text x="105" y="168" text-anchor="middle" font-size="12.5" fill="#334155">Roadside camera,</text>
+  <text x="105" y="185" text-anchor="middle" font-size="12.5" fill="#334155">video file or RTSP</text>
+  <text x="105" y="205" text-anchor="middle" font-size="11.5" fill="#64748b">(tested: 7 real clips)</text>
+
+  <!-- PipeGen -->
+  <rect x="220" y="85" width="560" height="160" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+  <text x="240" y="110" font-size="15" font-weight="700" fill="#065f46">CraftifAI PipeGen pipeline · DeepStream 7.1 · TensorRT 10.3</text>
+  <g font-size="12.5" fill="#0f172a" text-anchor="middle">
+    <rect x="240" y="130" width="95" height="56" rx="8" fill="#ffffff" stroke="#059669"/>
+    <text x="287" y="153">Decode +</text><text x="287" y="170">batch 1280×720</text>
+    <rect x="352" y="130" width="95" height="56" rx="8" fill="#ffffff" stroke="#059669"/>
+    <text x="399" y="153">CLAHE</text><text x="399" y="170">day / IR night</text>
+    <rect x="464" y="130" width="110" height="56" rx="8" fill="#ffffff" stroke="#059669"/>
+    <text x="519" y="150">Custom YOLOv8n</text><text x="519" y="166">5 species</text><text x="519" y="181">TensorRT FP16</text>
+    <rect x="591" y="130" width="80" height="56" rx="8" fill="#ffffff" stroke="#059669"/>
+    <text x="631" y="153">NvTracker</text><text x="631" y="170">track IDs</text>
+    <rect x="688" y="130" width="78" height="56" rx="8" fill="#ffffff" stroke="#059669"/>
+    <text x="727" y="148">MQTT</text><text x="727" y="164">JSON file</text><text x="727" y="180">display</text>
+  </g>
+  <g stroke="#334155" stroke-width="1.5" marker-end="url(#a)">
+    <line x1="335" y1="158" x2="350" y2="158"/><line x1="447" y1="158" x2="462" y2="158"/>
+    <line x1="574" y1="158" x2="589" y2="158"/><line x1="671" y1="158" x2="686" y2="158"/>
+  </g>
+  <text x="500" y="230" text-anchor="middle" font-size="12" fill="#065f46">RTX 2000 Ada · 30 FPS live, 0 dropped · ≈215 FPS headless · FP16 = FP32 accuracy</text>
+  <line x1="180" y1="165" x2="218" y2="165" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- broker -->
+  <rect x="830" y="110" width="160" height="110" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="910" y="145" text-anchor="middle" font-size="15" font-weight="700" fill="#1e3a8a">MQTT broker</text>
+  <text x="910" y="168" text-anchor="middle" font-size="12.5" fill="#334155">Mosquitto :1883</text>
+  <text x="910" y="186" text-anchor="middle" font-size="12" fill="#64748b">pipegen/detection/…</text>
+  <text x="910" y="203" text-anchor="middle" font-size="12" fill="#64748b">wildguard/…</text>
+  <line x1="780" y1="165" x2="828" y2="165" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="806" y="186" text-anchor="middle" font-size="10" fill="#475569">per object</text>
+
+  <!-- bridge -->
+  <rect x="830" y="290" width="340" height="120" rx="10" fill="#fefce8" stroke="#ca8a04" stroke-width="2"/>
+  <text x="1000" y="318" text-anchor="middle" font-size="15" font-weight="700" fill="#713f12">WildGuard bridge</text>
+  <text x="1000" y="342" text-anchor="middle" font-size="12.5" fill="#334155">5 target species · per-class confidence (puma 0.60)</text>
+  <text x="1000" y="360" text-anchor="middle" font-size="12.5" fill="#334155">confirm ≥ 3 frames and ≥ 0.5 s per track · road zone</text>
+  <text x="1000" y="378" text-anchor="middle" font-size="12.5" fill="#334155">5 s cool-down · look-alike veto (needs COCO model)</text>
+  <text x="1000" y="398" text-anchor="middle" font-size="12" fill="#713f12">→ one alert per animal on wildguard/perception/detections</text>
+  <line x1="935" y1="220" x2="985" y2="288" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="1010" y1="288" x2="960" y2="222" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- backend + dashboard -->
+  <rect x="440" y="300" width="340" height="110" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="610" y="328" text-anchor="middle" font-size="15" font-weight="700" fill="#4c1d95">Backend (FastAPI)</text>
+  <text x="610" y="352" text-anchor="middle" font-size="12.5" fill="#334155">MQTT observer · SQLite event log · latency metrics</text>
+  <text x="610" y="370" text-anchor="middle" font-size="12.5" fill="#334155">control + test API · evidence pack · WebSocket</text>
+  <line x1="828" y1="200" x2="782" y2="330" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <rect x="440" y="460" width="340" height="90" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="610" y="490" text-anchor="middle" font-size="15" font-weight="700" fill="#4c1d95">Mission-control dashboard (React)</text>
+  <text x="610" y="514" text-anchor="middle" font-size="12.5" fill="#334155">loop status · live alerts · history · analytics</text>
+  <text x="610" y="532" text-anchor="middle" font-size="12" fill="#64748b">for the highway road-safety / wildlife officer</text>
+  <line x1="610" y1="410" x2="610" y2="458" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- ESP32 pending -->
+  <rect x="830" y="460" width="340" height="150" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="1000" y="488" text-anchor="middle" font-size="15" font-weight="700" fill="#475569">ESP32 roadside unit (FirmGen) · pending</text>
+  <text x="1000" y="512" text-anchor="middle" font-size="12.5" fill="#475569">PRD: 30 requirements, ESP-IDF v5.5</text>
+  <text x="1000" y="530" text-anchor="middle" font-size="12.5" fill="#475569">HC-SR04 + PIR sensor fusion · species profiles</text>
+  <text x="1000" y="548" text-anchor="middle" font-size="12.5" fill="#475569">warning LEDs + buzzer ≤ 100 ms · ACK · fail-safe</text>
+  <text x="1000" y="574" text-anchor="middle" font-size="12" fill="#94a3b8">FirmGen project created, requirements review started;</text>
+  <text x="1000" y="591" text-anchor="middle" font-size="12" fill="#94a3b8">no board available to flash</text>
+  <line x1="1000" y1="410" x2="1000" y2="458" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#ad)"/>
+  <line x1="828" y1="520" x2="782" y2="390" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#ad)"/>
+  <text x="790" y="455" font-size="11" fill="#94a3b8">ACK</text>
+
+  <!-- record -->
+  <rect x="30" y="300" width="370" height="110" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="215" y="328" text-anchor="middle" font-size="15" font-weight="700" fill="#0f172a">Record and evidence</text>
+  <text x="215" y="352" text-anchor="middle" font-size="12.5" fill="#334155">PipeGen metadata.json (every frame)</text>
+  <text x="215" y="370" text-anchor="middle" font-size="12.5" fill="#334155">annotated output.mp4 · per-clip video test</text>
+  <line x1="660" y1="245" x2="300" y2="298" stroke="#334155" stroke-width="1.5" marker-end="url(#a)"/>
+</svg>
